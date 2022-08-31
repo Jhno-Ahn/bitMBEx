@@ -4,6 +4,22 @@
 
 {% block contents %}
 
+{% if memid %}
+<table>
+	<tr>
+		<th><span>{{memid}}</span>님 안녕하세요</th>
+	</tr>
+	<tr>
+		<td align="center">
+			<input class="inputbutton" type="button" value="주성" onclick="location='modify'">
+			<input class="inputbutton" type="button" value="탈뢰" onclick="location='delete'">
+			<input class="inputbutton" type="button" value="로그앙웃" onclick="location='logout'">
+		</td>
+	</tr>
+</table>
+
+
+{% else %}
 {% csrf_token %}
 <form method="post" action="login" name="mainform" onsubmit="return maincheck()">
 	<table>
@@ -28,6 +44,7 @@
 		</tr>	
 	</table>
 </form>
+{% endif %}
 {% endblock %}
 
 

@@ -13,6 +13,92 @@ from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger( __name__ )
 
+class ModifyProView(View):
+    @method_decorator( csrf_exempt )
+    def dispatch( self, request, *args, **kwargs ) :
+        return super( ModifyProView, self ).dispatch( request, *args, **kwargs )
+    def get(self, request):
+        pass
+    def post(self, request):
+        id = request.session.get("memid")
+        dto = Member.objects.get(id=id)
+        dto.passwd = request.POST["passwd"]
+        dto.email = request.POST["email"]
+        tel1 = request.POST["tel1"]
+        tel2 = request.POST["tel2"]
+        tel3 = request.POST["tel3"]
+        if tel1 and tel2 and tel3 :
+            tel = tel1 + "-" + tel2 + "-" + tel3
+        dto.tel = tel
+        dto.save()
+        return redirect("main")
+
+
+class ModifyView(View):
+    @method_decorator( csrf_exempt )
+    def dispatch( self, request, *args, **kwargs ) :
+        return super( ModifyView, self ).dispatch( request, *args, **kwargs )
+    def get(self, request):
+        template = loader.get_template("modify.html")
+        context = {}
+        return HttpResponse(template.render(context, request))
+    def post(self, request):
+        id = request.session.get("memid")
+        passwd = request.POST["passwd"]
+        dto = Member.objects.get(id=id)
+        if passwd == dto.passwd :
+            template = loader.get_template("modifypro.html")
+            
+            if dto.tel :
+                t = dto.tel.split("-")
+                context = {
+                    "dto" : dto,
+                    "t" : t,
+                    }
+            else :
+                context = {
+                    "dto" : dto,
+                    }
+        else :
+            template = loader.get_template("modify.html")
+            context = {
+                "message" : "비밀번호가 다릅니다."
+                }
+        return HttpResponse(template.render(context, request))
+        
+class DeleteView(View):
+    @method_decorator( csrf_exempt )
+    def dispatch( self, request, *args, **kwargs ) :
+        return super( DeleteView, self ).dispatch( request, *args, **kwargs )
+    def get(self, request):
+        template = loader.get_template("delete.html")
+        context = {}
+        return HttpResponse(template.render(context, request))
+    def post(self, request):
+        id = request.session.get("memid")
+        passwd = request.POST["passwd"]
+        dto = Member.objects.get(id=id)
+        if passwd == dto.passwd :
+            dto.delete()
+            del(request.session["memid"])
+            return redirect("main")
+        else :
+            template = loader.get_template("delete.html")
+            context = {
+                "message" : "비밀번호가 다릅니다"
+                }
+            return HttpResponse(template.render(context, request))
+            
+
+class LogoutView(View):
+    def get(self, request):
+        del(request.session["memid"])
+        return redirect("main")
+        
+    def post(self, request):
+        pass
+
+
 class MainView( View ) :
     def get(self, request ) :
         memid = request.session.get( "memid" )
@@ -98,7 +184,7 @@ class WriteView( View ) :
             logtime = DateFormat( datetime.now() ).format( "Y-m-d" )            
             )
         dto.save()
-        logger.info( "write : " + id )
+        logger.info( "write : " + request.POST["id"])
         return redirect( "login" )
         
         

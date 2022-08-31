@@ -15,6 +15,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 import os
 LOGGING = {
     "version" : 1,
@@ -59,6 +61,11 @@ LOGGING = {
             "handlers" : ["file"],
             "propagate" : True,
             "level" : "INFO",
+            },
+        "board" : {
+            "handlers" : ["file"],
+            "propagate" : True,
+            "level" : "INFO",
             }        
         }    
     }
@@ -78,7 +85,9 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+
 INSTALLED_APPS = [
+    "mathfilters",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -86,6 +95,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "member.apps.MemberConfig",
+    "board.apps.BoardConfig",
 ]
 
 MIDDLEWARE = [
